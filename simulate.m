@@ -5,7 +5,7 @@ classdef simulate < handle
     properties
         n = 20;
         
-        ang_v = -2;
+        ang_v = -2.5;
         lin_v = -0.2;
         
         fx_l = 458.654;
@@ -29,9 +29,9 @@ classdef simulate < handle
         dt = 0.1;
         
         % Noise settings
-        lin_vel_noise = 0.1*0.2;
-        ang_vel_noise = 0.05*0.2;
-        measurement_noise = 0.31;
+        lin_vel_noise = 0.1*0.;
+        ang_vel_noise = 0.05*0.;
+        measurement_noise = 0.31*0;
     end
     
     methods
@@ -123,16 +123,23 @@ classdef simulate < handle
             measurements_r = measurements_r + obj.measurement_noise * (2*rand(size(measurements_l))-ones(size(measurements_l)));
         end
         
-        function draw(obj,trail,pose,lm,no_inno)           
+        function draw(obj,trail,pose,lm,no_inno,lm_trail)           
             % landmarks
-            h1=plot3(obj.landmarks(:,1), obj.landmarks(:,2),obj.landmarks(:,3),'k.','MarkerSize',10);
-            hold on
-            h2=plot3(lm(1,:),lm(2,:),lm(3,:),'r.','MarkerSize',10);
             obj.trailline = plot3(obj.trail(1,:), obj.trail(2,:), obj.trail(3,:),'r', 'LineWidth', 2);
-            h3=plot3(trail(1,:), trail(2,:), trail(3,:),'g', 'LineWidth', 2);
+            hold on
+             
+            
+            h3=plot3(trail(1,:), trail(2,:), trail(3,:),'g-.', 'LineWidth', 2);
 %             h4=plot3(no_inno(1,:), no_inno(2,:), no_inno(3,:),'k', 'LineWidth', 2);
             drawAxes(pose,[trail(1,end), trail(2,end), trail(3,end)]);
             drawAxes(obj.robot(1:3,1:3),[obj.robot(1,4),obj.robot(2,4),obj.robot(3,4)]);
+            ind = [1,7,9,11,13,17];
+            for i = 1:6
+                h1=plot3(obj.landmarks(ind(i),1), obj.landmarks(ind(i),2),obj.landmarks(ind(i),3),'ko','MarkerSize',10);
+                h2=plot3(lm(1,ind(i)),lm(2,ind(i)),lm(3,ind(i)),'color', [0 0.5 0],'Marker','+','MarkerSize',15);
+                plot3(lm_trail(1,:,i),lm_trail(2,:,i),lm_trail(3,:,i),'color', [0 0.5 0], 'LineWidth', 2); 
+            end
+            
             
             
             % robot
@@ -159,10 +166,10 @@ classdef simulate < handle
             hold off
             grid on;
             xlim([-5,8]);
-            ylim([-10,10]); 
-            zlim([-10,10]); 
+            ylim([-5,6]); 
+            zlim([-3,9]); 
 %             axis([-radius-obj.range radius+obj.range -obj.range 2*radius+obj.range]);
-            title("EqF Simulation");
+%             title("EqF Simulation",'FontSize',15);
             xlabel("x (m)");
             ylabel("y (m)");
             zlabel("z (m)");

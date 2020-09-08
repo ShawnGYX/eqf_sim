@@ -3,9 +3,11 @@ world = simulate(20);
 
 EQF = eqf_slam();
 
+lm_trail = NaN(3,600,6);
+
 lyapn = NaN(1500,1);
 local_err = NaN(1500,60);
-for simulation_step = 1:600
+for simulation_step = 1:170
     % The robot drives in the simulated world. The simulator works out the
     % forward kinematics of the robot and provides you with noisy velocity
     % estimates. In practice, you would get these from your inputs to the
@@ -53,11 +55,42 @@ for simulation_step = 1:600
     end
     aligned_lm = lm(1:3,:)';
     
-
+    ind = [1,7,9,11,13,17];
+    
+    for i =1:6
+        lm_trail(:,1:end-1,i) = lm_trail(:,2:end,i);
+        lm_trail(:,end,i) = unaligned_landmark(:,ind(i));
+    end
+%     lm_trail(simulation_step,:,1) = unaligned_landmark(:,1)';
+%     lm_trail(simulation_step,:,2) = unaligned_landmark(:,7)';
+%     lm_trail(simulation_step,:,3) = unaligned_landmark(:,9)';
+%     lm_trail(simulation_step,:,4) = unaligned_landmark(:,11)';
+%     lm_trail(simulation_step,:,5) = unaligned_landmark(:,13)';
+%     lm_trail(simulation_step,:,6) = unaligned_landmark(:,17)';
    
     
     % This command draws the world to help you visualise what's going on.
     % You could try and plot your EKF output on top to compare.
-    world.draw(trail,pose,unaligned_landmark,trail_no_inno);
+    world.draw(trail,pose,unaligned_landmark,trail_no_inno,NaN(3,600,6));
     drawnow
 end
+
+for j = 1:600
+    
+    for i =1:6
+        
+        lm_i = inv(s)*[lm_trail(:,j,i);1];
+        lm_trail(:,j,i) = lm_i(1:3);
+        
+    end
+    t = inv(s)*[trail(:,j);1];
+        
+        trail(:,j) = t(1:3);
+    
+    
+end
+
+pose = inv(s)*pose;
+world.draw(trail,pose,aligned_lm',trail_no_inno,lm_trail);
+drawnow
+

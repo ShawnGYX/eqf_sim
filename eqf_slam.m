@@ -30,7 +30,7 @@ classdef eqf_slam < handle
         init_rb = [1,0,0,-1;0,1,0,0;0,0,1,8;0,0,0,1];
 
         Sigma = eye(60)*3;
-        robot_trail = NaN(3,2000);
+        robot_trail = NaN(3,600);
         robot_trail_no_inno = NaN(3,2000);
         
         fx_l = 458.654;
@@ -53,7 +53,7 @@ classdef eqf_slam < handle
         dt = 0.1;
         
         noiseP = 1;
-        noisep = 1;
+        noisep = 1.5;
         
     end
     
@@ -61,7 +61,8 @@ classdef eqf_slam < handle
         
         function obj = eqf_slam()
             obj.init_lm = obj.init_lm + obj.noisep*rand(3,20);
-            obj.init_rb(1:3,4) = obj.init_rb(1:3,4) + obj.noiseP*rand(3,1);
+%             obj.init_rb(1:3,4) = obj.init_rb(1:3,4) + obj.noiseP*rand(3,1);
+            obj.init_rb(1:3,4) = obj.init_rb(1:3,4) + 2*ones(3,1);
             obj.robot_trail(:,end) = [obj.init_rb(1,4);obj.init_rb(2,4);obj.init_rb(3,4)];
             obj.robot_trail_no_inno(:,end) = [obj.init_rb(1,4);obj.init_rb(2,4);obj.init_rb(3,4)];
         end
