@@ -48,12 +48,12 @@ classdef eqf_slam < handle
         
         
         P = eye(60)*0.1;
-        Q = eye(80)*0.1;
+        Q = eye(80)*0.7;
         
         dt = 0.1;
         
-        noiseP = 3;
-        noisep = 3;
+        noiseP = 4;
+        noisep = 4;
         
     end
     

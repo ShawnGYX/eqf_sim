@@ -1,13 +1,20 @@
 close all
 world = simulate(20);
 
+s_1=[];
+s_2=[];
+
+I4 = eye(4);
+
+len = 210;
+
 EQF = eqf_slam();
 
-lm_trail = NaN(3,600,6);
+lm_trail = NaN(3,len,6);
 
-lyapn = NaN(1500,1);
-local_err = NaN(1500,60);
-for simulation_step = 1:170
+lyapn = NaN(len,1);
+local_err = NaN(len,60);
+for simulation_step = 1:210
     % The robot drives in the simulated world. The simulator works out the
     % forward kinematics of the robot and provides you with noisy velocity
     % estimates. In practice, you would get these from your inputs to the
@@ -39,8 +46,12 @@ for simulation_step = 1:170
     
     EQF.update_innovation(Delta);
     
-    [trail,pose,trail_no_inno] = EQF.output_robot();
+    [trail,pose,trail_no_inno,p_no] = EQF.output_robot();
     
+    s1=pose*inv(world.robot)-I4;
+    s2=p_no*inv(world.robot)-I4;
+    s_1=[s_1;norm(s1)];
+    s_2=[s_2;norm(s2)];
     [lyapn(simulation_step),local_err(simulation_step,:)] = EQF.compute_lyap(world.robot,world.landmarks');
     
     s = pose*inv(world.robot);
@@ -75,7 +86,7 @@ for simulation_step = 1:170
     drawnow
 end
 
-for j = 1:600
+for j = 1:len
     
     for i =1:6
         
